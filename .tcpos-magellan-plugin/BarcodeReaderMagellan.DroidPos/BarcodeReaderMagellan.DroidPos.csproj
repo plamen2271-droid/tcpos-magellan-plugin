@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>monoandroid12.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>BarcodeReaderMagellan.DroidPos</AssemblyName>
+    <RootNamespace>MagellanBarcodeReader</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="MagellanBarcodeReader.cs" />
+    <Compile Include="TcpPosStubs.cs" />
+    <Compile Include="Properties\\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidLibrary Include="..\\libs\\datalogic-android-sdk-1.34.aar" />
+  </ItemGroup>
+</Project>

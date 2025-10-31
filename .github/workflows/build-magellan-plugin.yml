@@ -1,0 +1,37 @@
+name: Build Magellan TCPOS plugin
+
+on:
+  workflow_dispatch:  # lets you run it manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install Mono + msbuild
+      - name: Install Mono and msbuild
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https dirmngr gnupg ca-certificates
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+          echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+          sudo apt-get update
+          sudo apt-get install -y mono-complete msbuild
+
+      # Try to build our project
+      - name: Build plugin
+        working-directory: .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos
+        run: |
+          msbuild /t:Rebuild /p:Configuration=Release || msbuild /t:Rebuild /p:Configuration=Debug
+
+      # Upload whatever we built
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: magellan-plugin-build
+          path: |
+            .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos/bin/Release/**
+            .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos/bin/Debug/**

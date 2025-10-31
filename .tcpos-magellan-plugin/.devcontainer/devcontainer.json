@@ -1,0 +1,8 @@
+{
+  "name": "tcpos-magellan-plugin",
+  "image": "mcr.microsoft.com/vscode/devcontainers/dotnet:6.0",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "apt-get update && apt-get install -y mono-complete msbuild zip"
+}
