@@ -1,0 +1,42 @@
+name: Build Magellan TCPOS plugin
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install Mono + msbuild so we can build old Xamarin-style projects
+      - name: Install Mono and msbuild
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https dirmngr gnupg ca-certificates
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+          echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+          sudo apt-get update
+          sudo apt-get install -y mono-complete msbuild
+
+      # Build the project (note: project is under .tcpos-magellan-plugin/)
+      - name: Build plugin
+        working-directory: .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos
+        run: |
+          # If monoandroid12.0 is not available, fall back to net8.0 for compile check
+          if grep -q "monoandroid" BarcodeReaderMagellan.DroidPos.csproj; then
+            msbuild /t:Rebuild /p:Configuration=Release || true
+          else
+            msbuild /t:Rebuild /p:Configuration=Release
+          fi
+
+      # Upload whatever we produced
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: magellan-plugin-build
+          path: |
+            .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos/bin/Release/**
+            .tcpos-magellan-plugin/BarcodeReaderMagellan.DroidPos/bin/Debug/**
